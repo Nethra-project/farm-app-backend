@@ -1,5 +1,7 @@
--- Database Schema for Farm Platform
+CREATE DATABASE IF NOT EXISTS farm_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE farm_db;
 
+-- 1. Users Table
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     phone VARCHAR(15) UNIQUE NOT NULL,
@@ -10,6 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 2. Farmer Profiles
 CREATE TABLE IF NOT EXISTS farmer_profiles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL UNIQUE,
@@ -27,6 +30,7 @@ CREATE TABLE IF NOT EXISTS farmer_profiles (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 3. FPO Profiles
 CREATE TABLE IF NOT EXISTS fpo_profiles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL UNIQUE,
@@ -41,6 +45,7 @@ CREATE TABLE IF NOT EXISTS fpo_profiles (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 4. Buyer Profiles
 CREATE TABLE IF NOT EXISTS buyer_profiles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL UNIQUE,
@@ -56,6 +61,7 @@ CREATE TABLE IF NOT EXISTS buyer_profiles (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 5. Buyer Addresses
 CREATE TABLE IF NOT EXISTS buyer_addresses (
     id INT AUTO_INCREMENT PRIMARY KEY,
     buyer_id INT NOT NULL,
@@ -67,6 +73,7 @@ CREATE TABLE IF NOT EXISTS buyer_addresses (
     FOREIGN KEY (buyer_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 6. Driver Profiles
 CREATE TABLE IF NOT EXISTS driver_profiles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL UNIQUE,
@@ -85,6 +92,7 @@ CREATE TABLE IF NOT EXISTS driver_profiles (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 7. Listings
 CREATE TABLE IF NOT EXISTS listings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     farmer_id INT NOT NULL,
@@ -100,6 +108,7 @@ CREATE TABLE IF NOT EXISTS listings (
     FOREIGN KEY (farmer_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 8. Orders
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     listing_id INT NOT NULL,
@@ -125,6 +134,7 @@ CREATE TABLE IF NOT EXISTS orders (
     FOREIGN KEY (buyer_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 9. Delivery Jobs
 CREATE TABLE IF NOT EXISTS delivery_jobs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL UNIQUE,
@@ -147,6 +157,7 @@ CREATE TABLE IF NOT EXISTS delivery_jobs (
     FOREIGN KEY (driver_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 10. Driver Earnings
 CREATE TABLE IF NOT EXISTS driver_earnings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     driver_id INT NOT NULL,
@@ -158,6 +169,7 @@ CREATE TABLE IF NOT EXISTS driver_earnings (
     FOREIGN KEY (job_id) REFERENCES delivery_jobs(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 11. RFQs
 CREATE TABLE IF NOT EXISTS rfqs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     buyer_id INT NOT NULL,
@@ -174,6 +186,7 @@ CREATE TABLE IF NOT EXISTS rfqs (
     FOREIGN KEY (buyer_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 12. RFQ Quotes
 CREATE TABLE IF NOT EXISTS rfq_quotes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     rfq_id INT NOT NULL,
@@ -186,15 +199,18 @@ CREATE TABLE IF NOT EXISTS rfq_quotes (
     FOREIGN KEY (farmer_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 13. Mandi Prices
 CREATE TABLE IF NOT EXISTS mandi_prices (
     id INT AUTO_INCREMENT PRIMARY KEY,
     crop_name VARCHAR(100) NOT NULL,
     district VARCHAR(100) NOT NULL,
     mandi_price_per_unit DECIMAL(10,2) NOT NULL,
     unit VARCHAR(10) DEFAULT 'kg',
-    updated_at DATE NOT NULL
+    updated_at DATE NOT NULL,
+    INDEX idx_mandi_crop_district_date (crop_name, district, updated_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 14. Admin Invites
 CREATE TABLE IF NOT EXISTS admin_invites (
     id INT AUTO_INCREMENT PRIMARY KEY,
     invite_code VARCHAR(50) UNIQUE NOT NULL,
@@ -204,6 +220,7 @@ CREATE TABLE IF NOT EXISTS admin_invites (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 15. Admin Audit Logs
 CREATE TABLE IF NOT EXISTS admin_audit_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     admin_id INT NOT NULL,
@@ -215,12 +232,14 @@ CREATE TABLE IF NOT EXISTS admin_audit_logs (
     FOREIGN KEY (admin_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 16. System Settings
 CREATE TABLE IF NOT EXISTS system_settings (
     setting_key VARCHAR(50) PRIMARY KEY,
     setting_value TEXT NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Seed Settings Data
 INSERT INTO system_settings (setting_key, setting_value) VALUES 
 ('platform_fee_percent', '2.0'),
 ('transport_rate_per_km', '10.0'),
