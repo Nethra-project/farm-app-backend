@@ -1,11 +1,17 @@
 from flask import Flask, jsonify
 from database import init_db
 
+# Import Keerthi's Blueprint
+from farmer_profile_routes import farmer_profile_bp
+
 app = Flask(__name__)
 app.secret_key = 'super_secret_farm_key'
 
 # Initialize Database
 init_db(app)
+
+# Register Keerthi's Blueprint
+app.register_blueprint(farmer_profile_bp)
 
 # Helper function for unified responses
 def format_response(status, data=None, message=""):
