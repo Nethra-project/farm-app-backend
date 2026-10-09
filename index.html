@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Platform Frontend</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f7f6; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 400px; margin-bottom: 20px; }
+        input, select, button { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; }
+        button { background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #218838; }
+        #response { margin-top: 10px; padding: 10px; background: #e9ecef; border-radius: 4px; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <h2>Farm Platform Web Dashboard</h2>
+
+    <div class="card">
+        <h3>Register Farmer</h3>
+        <input type="text" id="phone" placeholder="Phone Number">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="registerUser()">Register</button>
+    </div>
+
+    <div class="card">
+        <h3>Active Crop Listings</h3>
+        <button onclick="fetchListings()">Fetch Listings</button>
+        <div id="listings-output"></div>
+    </div>
+
+    <div class="card">
+        <h3>Server Response</h3>
+        <div id="response">Waiting for action...</div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
