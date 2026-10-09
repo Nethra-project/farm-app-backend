@@ -15,30 +15,29 @@
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; padding:0; background: var(--bg); color: var(--text); }
         .top-bar { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 10px 20px; }
-        .lang-btn { background: white; color: var(--primary); border: none; padding: 5px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .lang-btn { background: white; color: var(--primary); border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; }
         
         .view-section { display: none; padding: 20px; max-width: 1100px; margin: 0 auto; }
         .view-section.active { display: block; }
 
-        /* Landing Page Styles */
-        .hero { text-align: center; padding: 60px 20px; background: white; border-radius: 8px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .hero { text-align: center; padding: 50px 20px; background: white; border-radius: 8px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .hero-btns button { padding: 14px 28px; font-size: 16px; margin: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-signup { background: var(--primary-light); color: white; }
         .btn-login { background: var(--accent); color: white; }
 
-        /* Form & Cards */
         .card { background: var(--card); padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        input, select, textarea, button { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 15px; }
+        input, select, textarea, button { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
         button.action-btn { background: var(--primary-light); color: white; font-weight: bold; border: none; cursor: pointer; }
+        button.action-btn:hover { background: var(--primary); }
+        button.secondary-btn { background: #616161; color: white; border: none; cursor: pointer; }
         
-        /* Dashboard Header */
         .dash-nav { display: flex; gap: 10px; background: #e8f5e9; padding: 10px; border-radius: 6px; margin-bottom: 20px; overflow-x: auto; }
         .dash-nav button { width: auto; margin: 0; background: white; color: var(--primary); font-weight: bold; }
 
-        /* Output Console */
         .console-box { background: #1e1e1e; color: #4af626; padding: 15px; border-radius: 6px; font-family: monospace; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; }
-        .warning-banner { background: #fff3cd; color: #856404; padding: 12px; border-radius: 4px; border: 1px solid #ffeeba; margin-bottom: 15px; display: none; }
+        .otp-banner { background: #e3f2fd; color: #0d47a1; padding: 12px; border-radius: 4px; border: 1px solid #bbdefb; margin: 10px 0; font-weight: bold; display: none; }
+        .badge-verified { background: #2e7d32; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; display: inline-block; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -46,24 +45,24 @@
     <div class="top-bar">
         <h2 id="txt-app-title">🌾 Krishi Bazaar</h2>
         <div>
-            <button class="lang-btn" onclick="toggleLanguage()">Language: <span id="current-lang">English</span></button>
-            <button id="logout-btn" class="lang-btn" style="display:none; background:#d32f2f; color:white; margin-left:10px;" onclick="handleLogout()">Logout</button>
+            <button class="lang-btn" id="btn-toggle-lang">Language: English</button>
+            <button id="logout-btn" class="lang-btn" style="display:none; background:#d32f2f; color:white; margin-left:10px;">Logout</button>
         </div>
     </div>
 
-    <!-- 1. LANDING PAGE VIEW -->
+    <!-- 1. LANDING PAGE -->
     <div id="view-landing" class="view-section active">
         <div class="hero">
             <h1 id="txt-hero-title">Direct Agricultural Marketplace</h1>
             <p id="txt-hero-desc">Connecting Farmers, FPOs, Consumers, Bulk Buyers, and Drivers seamlessly.</p>
             <div class="hero-btns">
-                <button class="btn-signup" onclick="showView('view-role-select')" id="txt-btn-signup">Sign Up</button>
-                <button class="btn-login" onclick="showView('view-login')" id="txt-btn-login">Log In</button>
+                <button class="btn-signup" id="btn-goto-signup">Sign Up</button>
+                <button class="btn-login" id="btn-goto-login">Log In</button>
             </div>
         </div>
     </div>
 
-    <!-- 2. ROLE SELECTION VIEW -->
+    <!-- 2. ROLE SELECTION -->
     <div id="view-role-select" class="view-section">
         <div class="card">
             <h3 id="txt-select-role">Choose Interface / Role</h3>
@@ -74,23 +73,31 @@
                 <button class="action-btn" onclick="setupSignupForm('bulk_buyer')">🏢 Bulk Buyer (Hotel/Mess/Retailer)</button>
                 <button class="action-btn" onclick="setupSignupForm('driver')">🚚 Pickup & Delivery Driver</button>
             </div>
-            <button style="background:#757575;" onclick="showView('view-landing')">Back</button>
+            <button class="secondary-btn" onclick="showView('view-landing')">Back to Home</button>
         </div>
     </div>
 
-    <!-- 3. DYNAMIC SIGNUP VIEW -->
+    <!-- 3. SIGNUP WITH OTP VERIFICATION -->
     <div id="view-signup" class="view-section">
         <div class="card">
             <h3 id="signup-title">Sign Up</h3>
-            <div id="signup-fields"></div>
             
-            <!-- Mobile OTP Verification Component -->
-            <div id="otp-section" style="display:none; border-top:1px solid #eee; margin-top:10px; padding-top:10px;">
-                <input type="text" id="signup-otp" placeholder="Enter Mobile OTP (Use 123456)">
+            <div id="signup-fields"></div>
+
+            <!-- OTP Trigger & Input Box -->
+            <div id="otp-wrapper" style="border-top:1px solid #ddd; margin-top:15px; padding-top:15px;">
+                <button class="action-btn" id="btn-send-otp" type="button" style="background:#0288d1;">📱 Send OTP to Mobile</button>
+                
+                <div id="otp-display-box" class="otp-banner"></div>
+                
+                <div id="otp-input-group" style="display:none;">
+                    <input type="text" id="su-otp-input" placeholder="Enter 6-digit OTP code">
+                    <button class="action-btn" id="btn-verify-otp" type="button" style="background:#388e3c;">✅ Verify OTP</button>
+                </div>
             </div>
 
-            <button class="action-btn" id="signup-submit-btn" onclick="submitSignup()">Verify Mobile & Register</button>
-            <button style="background:#757575;" onclick="showView('view-role-select')">Back</button>
+            <button class="action-btn" id="signup-submit-btn" type="button" style="margin-top:15px;" disabled>Complete Registration</button>
+            <button class="secondary-btn" onclick="showView('view-role-select')">Back</button>
         </div>
     </div>
 
@@ -104,29 +111,24 @@
                 <option value="driver">Pickup & Delivery</option>
                 <option value="admin">Administration</option>
             </select>
-            <input type="text" id="login-phone" placeholder="Mobile Number / Email">
+            <input type="text" id="login-phone" placeholder="Mobile Number">
             <input type="password" id="login-pass" placeholder="Password">
-            <button class="action-btn" onclick="handleLogin()">Login</button>
-            <button style="background:#757575;" onclick="showView('view-landing')">Back</button>
+            <button class="action-btn" id="btn-execute-login" type="button">Login</button>
+            <button class="secondary-btn" onclick="showView('view-landing')">Back to Home</button>
         </div>
     </div>
 
-    <!-- 5. MAIN DASHBOARD VIEW (DYNAMICALLY SWITCHES FOR ALL 4 INTERFACES) -->
+    <!-- 5. DASHBOARD VIEW -->
     <div id="view-dashboard" class="view-section">
-        <div id="approval-warning" class="warning-banner">
-            ⚠️ <strong>Account Pending Verification:</strong> Your account details/documents are under admin review. Some features (like adding listings or job acceptance) are locked.
-        </div>
-
         <div class="dash-nav" id="dash-nav-buttons"></div>
-
         <div id="dash-main-content"></div>
     </div>
 
-    <!-- GLOBAL RESPONSE CONSOLE -->
+    <!-- CONSOLE -->
     <div class="view-section active" style="padding-top:0;">
         <div class="card" style="background:#fafafa;">
-            <h4 style="margin:0 0 10px 0;">Live System Console Output</h4>
-            <div id="console-output" class="console-box">System Operational. Awaiting action...</div>
+            <h4 style="margin:0 0 10px 0;">Live System Console</h4>
+            <div id="console-output" class="console-box">System Operational.</div>
         </div>
     </div>
 
