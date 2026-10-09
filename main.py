@@ -2,6 +2,10 @@ import os
 from flask import Flask, jsonify
 from database import db, init_db
 
+from flask import Flask
+from flask_cors import CORS
+
+
 # Import all Blueprint routes
 from auth_routes import auth_bp
 from farmer_profile_routes import farmer_profile_bp
@@ -22,6 +26,9 @@ from admin_portal_routes import admin_portal_bp
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'super_secret_farm_key_2026')
+
+app = Flask(__name__)
+CORS(app)  # Enables cross-origin requests for all routes
 
 # MySQL connection string
 # Replace 'root' and 'password' with your MySQL username and password
