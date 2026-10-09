@@ -1,155 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agricultural Marketplace Portal</title>
-    <style>
-        :root {
-            --primary: #2e7d32;
-            --primary-dark: #1b5e20;
-            --bg: #f4f6f8;
-            --card-bg: #ffffff;
-            --text: #333333;
-        }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: var(--bg); color: var(--text); }
-        header { background-color: var(--primary-dark); color: white; padding: 15px 30px; text-align: center; }
-        nav { display: flex; justify-content: center; background: #388e3c; overflow-x: auto; }
-        nav button { background: none; border: none; color: white; padding: 14px 20px; font-size: 15px; cursor: pointer; transition: 0.2s; }
-        nav button:hover, nav button.active { background-color: var(--primary-dark); font-weight: bold; }
-        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .card { background: var(--card-bg); padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        input, select, textarea, button { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button.btn-submit { background-color: var(--primary); color: white; font-weight: bold; border: none; cursor: pointer; }
-        button.btn-submit:hover { background-color: var(--primary-dark); }
-        .response-box { background: #263238; color: #80cbc4; padding: 15px; border-radius: 6px; font-family: monospace; white-space: pre-wrap; word-break: break-all; max-height: 250px; overflow-y: auto; }
-    </style>
-</head>
-<body>
-
-    <header>
-        <h1>🌾 Agricultural Marketplace Dashboard</h1>
-        <p>Connecting Farmers, FPOs, Buyers, Drivers & Admins</p>
-    </header>
-
-    <nav>
-        <button class="nav-btn active" onclick="switchTab('auth')">🔐 Auth & Users</button>
-        <button class="nav-btn" onclick="switchTab('farmer')">👨‍🌾 Farmer & Listings</button>
-        <button class="nav-btn" onclick="switchTab('fpo')">🏛️ FPO Hub</button>
-        <button class="nav-btn" onclick="switchTab('buyer')">🛒 Buyer Portal & RFQs</button>
-        <button class="nav-btn" onclick="switchTab('driver')">🚚 Driver & Logistics</button>
-        <button class="nav-btn" onclick="switchTab('admin')">⚙️ Admin Control</button>
-    </nav>
-
-    <div class="container">
-
-        <!-- TAB 1: AUTHENTICATION -->
-        <div id="auth" class="tab-content active">
-            <div class="grid">
-                <div class="card">
-                    <h3>Account Registration</h3>
-                    <input type="text" id="reg-phone" placeholder="Phone Number">
-                    <input type="email" id="reg-email" placeholder="Email (Optional)">
-                    <input type="password" id="reg-pass" placeholder="Password">
-                    <select id="reg-role">
-                        <option value="farmer">Farmer</option>
-                        <option value="fpo">FPO</option>
-                        <option value="buyer">Buyer</option>
-                        <option value="driver">Driver</option>
-                    </select>
-                    <button class="btn-submit" onclick="handleRegister()">Create Account</button>
-                </div>
-                <div class="card">
-                    <h3>Account Login</h3>
-                    <input type="text" id="login-phone" placeholder="Phone Number">
-                    <input type="password" id="login-pass" placeholder="Password">
-                    <button class="btn-submit" onclick="handleLogin()">Login</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 2: FARMER & LISTINGS -->
-        <div id="farmer" class="tab-content">
-            <div class="grid">
-                <div class="card">
-                    <h3>Post New Crop Listing</h3>
-                    <input type="text" id="list-crop" placeholder="Crop Name (e.g. Tomatoes)">
-                    <input type="text" id="list-cat" placeholder="Category (e.g. Vegetables)">
-                    <input type="number" id="list-qty" placeholder="Quantity">
-                    <input type="text" id="list-unit" value="kg" placeholder="Unit (kg/quintal)">
-                    <input type="number" step="0.01" id="list-price" placeholder="Price per Unit (₹)">
-                    <input type="text" id="list-district" placeholder="District">
-                    <textarea id="list-desc" placeholder="Crop Description"></textarea>
-                    <button class="btn-submit" onclick="createListing()">Publish Listing</button>
-                </div>
-                <div class="card">
-                    <h3>Marketplace Explorer</h3>
-                    <button class="btn-submit" onclick="getMarketplaceListings()">Refresh Active Listings</button>
-                    <button class="btn-submit" style="background:#0288d1; margin-top:5px;" onclick="getMandiPrices()">Fetch Mandi Rates</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 3: FPO HUB -->
-        <div id="fpo" class="tab-content">
-            <div class="card">
-                <h3>FPO Profile Setup</h3>
-                <input type="text" id="fpo-name" placeholder="FPO Name">
-                <input type="text" id="fpo-reg" placeholder="Registration Number">
-                <input type="text" id="fpo-district" placeholder="District">
-                <input type="text" id="fpo-state" placeholder="State">
-                <input type="text" id="fpo-pincode" placeholder="Pincode">
-                <input type="text" id="fpo-contact" placeholder="Contact Person">
-                <button class="btn-submit" onclick="saveFPOProfile()">Save FPO Details</button>
-            </div>
-        </div>
-
-        <!-- TAB 4: BUYER PORTAL & RFQs -->
-        <div id="buyer" class="tab-content">
-            <div class="grid">
-                <div class="card">
-                    <h3>Create Bulk Requirement (RFQ)</h3>
-                    <input type="text" id="rfq-crop" placeholder="Required Crop">
-                    <input type="number" id="rfq-qty" placeholder="Required Quantity">
-                    <input type="date" id="rfq-date">
-                    <input type="number" id="rfq-target" placeholder="Target Price per Unit">
-                    <input type="text" id="rfq-district" placeholder="Delivery District">
-                    <button class="btn-submit" onclick="createRFQ()">Submit RFQ</button>
-                </div>
-                <div class="card">
-                    <h3>Browse Open RFQs</h3>
-                    <button class="btn-submit" onclick="fetchRFQs()">Load Buyer RFQs</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 5: DRIVER & LOGISTICS -->
-        <div id="driver" class="tab-content">
-            <div class="card">
-                <h3>Logistics & Open Deliveries</h3>
-                <button class="btn-submit" onclick="fetchDeliveryJobs()">Search Available Delivery Jobs</button>
-            </div>
-        </div>
-
-        <!-- TAB 6: ADMIN CONTROL -->
-        <div id="admin" class="tab-content">
-            <div class="card">
-                <h3>System Operations & Settings</h3>
-                <button class="btn-submit" onclick="fetchSystemSettings()">View Platform Settings</button>
-            </div>
-        </div>
-
-        <!-- REAL-TIME RESPONSE PANEL -->
+<!-- TAB 1: AUTHENTICATION -->
+<div id="auth" class="tab-content active">
+    <div class="grid">
         <div class="card">
-            <h3>Live API Response Console</h3>
-            <div id="console-output" class="response-box">Ready for action...</div>
+            <h3>Account Registration</h3>
+            <input type="text" id="reg-phone" placeholder="Phone Number">
+            <input type="email" id="reg-email" placeholder="Email (Optional)">
+            <input type="password" id="reg-pass" placeholder="Password">
+            
+            <!-- Main Role Selection -->
+            <select id="reg-role" onchange="toggleRoleFields()">
+                <option value="farmer">Farmer</option>
+                <option value="fpo">FPO</option>
+                <option value="buyer">Buyer</option>
+                <option value="driver">Driver</option>
+            </select>
+
+            <!-- Dynamic Buyer Options (Hidden by default) -->
+            <div id="buyer-type-container" style="display: none; border-top: 1px dashed #ccc; margin-top: 10px; padding-top: 10px;">
+                <label style="font-size: 12px; font-weight: bold; color: #555;">BUYER CATEGORY</label>
+                <select id="reg-buyer-type" onchange="toggleBulkBuyerFields()">
+                    <option value="consumer">Retail / Consumer Buyer</option>
+                    <option value="bulk_buyer">Bulk Buyer (Business / Wholesale)</option>
+                </select>
+
+                <!-- Additional Bulk Buyer Fields -->
+                <div id="bulk-buyer-fields" style="display: none;">
+                    <input type="text" id="reg-business-name" placeholder="Business / Restaurant / Hotel Name">
+                    <select id="reg-business-type">
+                        <option value="restaurant">Restaurant</option>
+                        <option value="hotel">Hotel</option>
+                        <option value="mess">Mess / Canteen</option>
+                        <option value="retailer">Retailer / Supermarket</option>
+                        <option value="processor">Food Processor</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <input type="text" id="reg-gstin" placeholder="GSTIN (Optional for Bulk)">
+                    <input type="text" id="reg-monthly-qty" placeholder="Approx. Monthly Requirement (e.g. 500 kg)">
+                </div>
+            </div>
+
+            <button class="btn-submit" onclick="handleRegister()">Create Account</button>
         </div>
 
+        <div class="card">
+            <h3>Account Login</h3>
+            <input type="text" id="login-phone" placeholder="Phone Number">
+            <input type="password" id="login-pass" placeholder="Password">
+            <button class="btn-submit" onclick="handleLogin()">Login</button>
+        </div>
     </div>
-
-    <script src="app.js"></script>
-</body>
-</html>
+</div>
