@@ -1,52 +1,135 @@
-<!-- TAB 1: AUTHENTICATION -->
-<div id="auth" class="tab-content active">
-    <div class="grid">
-        <div class="card">
-            <h3>Account Registration</h3>
-            <input type="text" id="reg-phone" placeholder="Phone Number">
-            <input type="email" id="reg-email" placeholder="Email (Optional)">
-            <input type="password" id="reg-pass" placeholder="Password">
-            
-            <!-- Main Role Selection -->
-            <select id="reg-role" onchange="toggleRoleFields()">
-                <option value="farmer">Farmer</option>
-                <option value="fpo">FPO</option>
-                <option value="buyer">Buyer</option>
-                <option value="driver">Driver</option>
-            </select>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Krishi Bazaar - Agri Marketplace</title>
+    <style>
+        :root {
+            --primary: #1b5e20;
+            --primary-light: #2e7d32;
+            --accent: #f57f17;
+            --bg: #f4f6f8;
+            --card: #ffffff;
+            --text: #212121;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; padding:0; background: var(--bg); color: var(--text); }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 10px 20px; }
+        .lang-btn { background: white; color: var(--primary); border: none; padding: 5px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        
+        .view-section { display: none; padding: 20px; max-width: 1100px; margin: 0 auto; }
+        .view-section.active { display: block; }
 
-            <!-- Dynamic Buyer Options (Hidden by default) -->
-            <div id="buyer-type-container" style="display: none; border-top: 1px dashed #ccc; margin-top: 10px; padding-top: 10px;">
-                <label style="font-size: 12px; font-weight: bold; color: #555;">BUYER CATEGORY</label>
-                <select id="reg-buyer-type" onchange="toggleBulkBuyerFields()">
-                    <option value="consumer">Retail / Consumer Buyer</option>
-                    <option value="bulk_buyer">Bulk Buyer (Business / Wholesale)</option>
-                </select>
+        /* Landing Page Styles */
+        .hero { text-align: center; padding: 60px 20px; background: white; border-radius: 8px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .hero-btns button { padding: 14px 28px; font-size: 16px; margin: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-signup { background: var(--primary-light); color: white; }
+        .btn-login { background: var(--accent); color: white; }
 
-                <!-- Additional Bulk Buyer Fields -->
-                <div id="bulk-buyer-fields" style="display: none;">
-                    <input type="text" id="reg-business-name" placeholder="Business / Restaurant / Hotel Name">
-                    <select id="reg-business-type">
-                        <option value="restaurant">Restaurant</option>
-                        <option value="hotel">Hotel</option>
-                        <option value="mess">Mess / Canteen</option>
-                        <option value="retailer">Retailer / Supermarket</option>
-                        <option value="processor">Food Processor</option>
-                        <option value="other">Other</option>
-                    </select>
-                    <input type="text" id="reg-gstin" placeholder="GSTIN (Optional for Bulk)">
-                    <input type="text" id="reg-monthly-qty" placeholder="Approx. Monthly Requirement (e.g. 500 kg)">
-                </div>
-            </div>
+        /* Form & Cards */
+        .card { background: var(--card); padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        input, select, textarea, button { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button.action-btn { background: var(--primary-light); color: white; font-weight: bold; border: none; cursor: pointer; }
+        
+        /* Dashboard Header */
+        .dash-nav { display: flex; gap: 10px; background: #e8f5e9; padding: 10px; border-radius: 6px; margin-bottom: 20px; overflow-x: auto; }
+        .dash-nav button { width: auto; margin: 0; background: white; color: var(--primary); font-weight: bold; }
 
-            <button class="btn-submit" onclick="handleRegister()">Create Account</button>
-        </div>
+        /* Output Console */
+        .console-box { background: #1e1e1e; color: #4af626; padding: 15px; border-radius: 6px; font-family: monospace; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; }
+        .warning-banner { background: #fff3cd; color: #856404; padding: 12px; border-radius: 4px; border: 1px solid #ffeeba; margin-bottom: 15px; display: none; }
+    </style>
+</head>
+<body>
 
-        <div class="card">
-            <h3>Account Login</h3>
-            <input type="text" id="login-phone" placeholder="Phone Number">
-            <input type="password" id="login-pass" placeholder="Password">
-            <button class="btn-submit" onclick="handleLogin()">Login</button>
+    <div class="top-bar">
+        <h2 id="txt-app-title">🌾 Krishi Bazaar</h2>
+        <div>
+            <button class="lang-btn" onclick="toggleLanguage()">Language: <span id="current-lang">English</span></button>
+            <button id="logout-btn" class="lang-btn" style="display:none; background:#d32f2f; color:white; margin-left:10px;" onclick="handleLogout()">Logout</button>
         </div>
     </div>
-</div>
+
+    <!-- 1. LANDING PAGE VIEW -->
+    <div id="view-landing" class="view-section active">
+        <div class="hero">
+            <h1 id="txt-hero-title">Direct Agricultural Marketplace</h1>
+            <p id="txt-hero-desc">Connecting Farmers, FPOs, Consumers, Bulk Buyers, and Drivers seamlessly.</p>
+            <div class="hero-btns">
+                <button class="btn-signup" onclick="showView('view-role-select')" id="txt-btn-signup">Sign Up</button>
+                <button class="btn-login" onclick="showView('view-login')" id="txt-btn-login">Log In</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. ROLE SELECTION VIEW -->
+    <div id="view-role-select" class="view-section">
+        <div class="card">
+            <h3 id="txt-select-role">Choose Interface / Role</h3>
+            <div class="grid">
+                <button class="action-btn" onclick="setupSignupForm('farmer')">👨‍🌾 Farmer</button>
+                <button class="action-btn" onclick="setupSignupForm('fpo')">🏛️ FPO (Organization)</button>
+                <button class="action-btn" onclick="setupSignupForm('consumer')">🛒 Consumer / Retail Buyer</button>
+                <button class="action-btn" onclick="setupSignupForm('bulk_buyer')">🏢 Bulk Buyer (Hotel/Mess/Retailer)</button>
+                <button class="action-btn" onclick="setupSignupForm('driver')">🚚 Pickup & Delivery Driver</button>
+            </div>
+            <button style="background:#757575;" onclick="showView('view-landing')">Back</button>
+        </div>
+    </div>
+
+    <!-- 3. DYNAMIC SIGNUP VIEW -->
+    <div id="view-signup" class="view-section">
+        <div class="card">
+            <h3 id="signup-title">Sign Up</h3>
+            <div id="signup-fields"></div>
+            
+            <!-- Mobile OTP Verification Component -->
+            <div id="otp-section" style="display:none; border-top:1px solid #eee; margin-top:10px; padding-top:10px;">
+                <input type="text" id="signup-otp" placeholder="Enter Mobile OTP (Use 123456)">
+            </div>
+
+            <button class="action-btn" id="signup-submit-btn" onclick="submitSignup()">Verify Mobile & Register</button>
+            <button style="background:#757575;" onclick="showView('view-role-select')">Back</button>
+        </div>
+    </div>
+
+    <!-- 4. LOGIN VIEW -->
+    <div id="view-login" class="view-section">
+        <div class="card" style="max-width:400px; margin: 0 auto;">
+            <h3 id="txt-login-heading">Account Login</h3>
+            <select id="login-role">
+                <option value="farmer">Farmer / FPO</option>
+                <option value="buyer">Consumer / Bulk Buyer</option>
+                <option value="driver">Pickup & Delivery</option>
+                <option value="admin">Administration</option>
+            </select>
+            <input type="text" id="login-phone" placeholder="Mobile Number / Email">
+            <input type="password" id="login-pass" placeholder="Password">
+            <button class="action-btn" onclick="handleLogin()">Login</button>
+            <button style="background:#757575;" onclick="showView('view-landing')">Back</button>
+        </div>
+    </div>
+
+    <!-- 5. MAIN DASHBOARD VIEW (DYNAMICALLY SWITCHES FOR ALL 4 INTERFACES) -->
+    <div id="view-dashboard" class="view-section">
+        <div id="approval-warning" class="warning-banner">
+            ⚠️ <strong>Account Pending Verification:</strong> Your account details/documents are under admin review. Some features (like adding listings or job acceptance) are locked.
+        </div>
+
+        <div class="dash-nav" id="dash-nav-buttons"></div>
+
+        <div id="dash-main-content"></div>
+    </div>
+
+    <!-- GLOBAL RESPONSE CONSOLE -->
+    <div class="view-section active" style="padding-top:0;">
+        <div class="card" style="background:#fafafa;">
+            <h4 style="margin:0 0 10px 0;">Live System Console Output</h4>
+            <div id="console-output" class="console-box">System Operational. Awaiting action...</div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
