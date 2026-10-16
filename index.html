@@ -3,98 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krishi Bazaar Portal</title>
+    <title>Krishi Bazaar - Comprehensive Agri Marketplace</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f8; margin: 0; padding: 20px; color: #333; }
-        header { background: #1b5e20; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; }
-        .container { max-width: 800px; margin: 20px auto; }
+        :root { --primary: #1b5e20; --primary-light: #2e7d32; --accent: #f57f17; --bg: #f4f6f8; --card: #ffffff; --text: #333; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+        header { background: var(--primary); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        header h2 { margin: 0; font-size: 22px; }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .btn-header { background: white; color: var(--primary); border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
         .view { display: none; }
         .view.active { display: block; }
-        .card { background: white; padding: 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        input, select, button { width: 100%; padding: 12px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        button { background: #2e7d32; color: white; border: none; font-weight: bold; cursor: pointer; }
-        button:hover { background: #1b5e20; }
-        .role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
-        .role-card { background: #e8f5e9; border: 2px solid #c8e6c9; padding: 20px; text-align: center; border-radius: 6px; cursor: pointer; font-weight: bold; color: #1b5e20; }
-        .role-card:hover { background: #c8e6c9; }
-        #console { background: #1e1e1e; color: #4af626; padding: 15px; font-family: monospace; white-space: pre-wrap; border-radius: 6px; max-height: 200px; overflow-y: auto; }
+        .card { background: var(--card); padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        input, select, textarea, button { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+        button.btn-main { background: var(--primary-light); color: white; font-weight: bold; border: none; cursor: pointer; transition: 0.2s; }
+        button.btn-main:hover { background: var(--primary); }
+        button.btn-secondary { background: #616161; color: white; border: none; cursor: pointer; }
+        .role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
+        .role-card { background: white; border: 2px solid #c8e6c9; padding: 25px; text-align: center; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: bold; color: var(--primary); font-size: 16px; }
+        .role-card:hover { border-color: var(--primary); background: #f1f8e9; transform: translateY(-2px); }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .stat-card { background: #e8f5e9; border-left: 5px solid var(--primary); padding: 20px; border-radius: 6px; }
+        .stat-card h4 { margin: 0 0 10px 0; color: var(--primary); font-size: 14px; text-transform: uppercase; }
+        .stat-card .value { font-size: 24px; font-weight: bold; margin: 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        th { background: #f5f5f5; color: #333; }
+        .badge { padding: 5px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-block; }
+        .badge.pending { background: #fff3cd; color: #856404; }
+        .badge.verified, .badge.active { background: #d4edda; color: #155724; }
+        .badge.rejected { background: #f8d7da; color: #721c24; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .tab-btn { background: none; border: none; font-size: 15px; font-weight: bold; color: #666; cursor: pointer; padding: 8px 16px; border-radius: 4px; width: auto; margin: 0; }
+        .tab-btn.active { background: var(--primary-light); color: white; }
     </style>
 </head>
 <body>
 
     <header>
-        <h2 id="ui-title">🌾 Krishi Bazaar</h2>
-        <div>
-            <button onclick="toggleLang()" style="width: auto; padding: 6px 12px; background: white; color: #1b5e20;">हिंदी / English</button>
-            <button id="logout-btn" onclick="logout()" style="display:none; width: auto; padding: 6px 12px; background: #c62828; margin-left: 10px;">Logout</button>
+        <h2 id="ui-title">🌾 Krishi Bazaar Portal</h2>
+        <div class="header-actions">
+            <button class="btn-header" onclick="toggleLanguage()">हिंदी / English</button>
+            <button id="logout-btn" class="btn-header" style="display:none; background:#c62828; color:white;" onclick="logoutUser()">Logout</button>
         </div>
     </header>
 
     <div class="container">
-        <!-- Landing View -->
+
+        <!-- VIEW 1: LANDING PAGE -->
         <div id="view-landing" class="view active">
-            <div class="card" style="text-align: center; padding: 40px;">
-                <h1 id="ui-hero">Direct Agricultural Marketplace</h1>
-                <p>Select an action to get started:</p>
-                <button style="width: 200px; margin: 10px;" onclick="showView('view-role-select')">Sign Up</button>
-                <button style="width: 200px; margin: 10px; background: #0288d1;" onclick="showView('view-login')">Log In</button>
+            <div class="card" style="text-align: center; padding: 60px 20px;">
+                <h1 id="hero-title" style="font-size: 36px; color: var(--primary);">Direct Agricultural Marketplace</h1>
+                <p id="hero-desc" style="font-size: 18px; color: #666; margin-bottom: 40px;">Empowering Farmers, FPOs, Buyers, and Drivers with transparent trade and direct logistics.</p>
+                <div style="display: flex; justify-content: center; gap: 20px;">
+                    <button class="btn-main" style="width: 220px; padding: 15px; font-size: 16px;" onclick="showView('view-role-select')">Sign Up</button>
+                    <button class="btn-main" style="width: 220px; padding: 15px; font-size: 16px; background: var(--accent);" onclick="showView('view-login')">Log In</button>
+                </div>
             </div>
         </div>
 
-        <!-- Role Select View -->
+        <!-- VIEW 2: ROLE SELECTION -->
         <div id="view-role-select" class="view">
             <div class="card">
                 <h3>Select Your Role</h3>
                 <div class="role-grid">
-                    <div class="role-card" onclick="setupSignup('farmer')">👨‍🌾 Farmer</div>
-                    <div class="role-card" onclick="setupSignup('fpo')">🏛️ FPO</div>
-                    <div class="role-card" onclick="setupSignup('consumer')">🛒 Consumer</div>
-                    <div class="role-card" onclick="setupSignup('bulk_buyer')">🏢 Bulk Buyer</div>
-                    <div class="role-card" onclick="setupSignup('driver')">🚚 Delivery Driver</div>
+                    <div class="role-card" onclick="initSignup('farmer')">👨‍🌾 Farmer</div>
+                    <div class="role-card" onclick="initSignup('fpo')">🏛️ FPO Producer</div>
+                    <div class="role-card" onclick="initSignup('consumer')">🛒 Consumer</div>
+                    <div class="role-card" onclick="initSignup('bulk_buyer')">🏢 Bulk Buyer</div>
+                    <div class="role-card" onclick="initSignup('driver')">🚚 Delivery Driver</div>
                 </div>
-                <button style="background: #616161; margin-top: 15px;" onclick="showView('view-landing')">Back</button>
+                <button class="btn-secondary" style="margin-top: 30px; width: 150px;" onclick="showView('view-landing')">Back</button>
             </div>
         </div>
 
-        <!-- Signup View -->
+        <!-- VIEW 3: MULTI-STEP SIGNUP & OTP -->
         <div id="view-signup" class="view">
-            <div class="card">
-                <h3 id="signup-header">Registration</h3>
-                <div id="signup-form-fields"></div>
-                <div style="border-top: 1px solid #eee; margin-top: 15px; padding-top: 15px;">
-                    <input type="text" id="su-phone" placeholder="Mobile Number (10 digits)">
-                    <button style="background: #0288d1;" onclick="requestOTP()">Send Server OTP (Code: 123456)</button>
-                    <div id="otp-section" style="display:none; margin-top: 10px;">
-                        <input type="text" id="su-otp" placeholder="Enter 6-digit OTP">
-                        <button style="background: #388e3c;" onclick="verifyOTP()">Verify OTP</button>
+            <div class="card" style="max-width: 700px; margin: 0 auto;">
+                <h3 id="signup-heading">Registration</h3>
+                <div id="signup-form-container"></div>
+                
+                <div style="background: #f9f9f9; padding: 20px; border-radius: 6px; margin-top: 20px; border: 1px solid #e0e0e0;">
+                    <h4 style="margin-top:0;">Mobile Number Verification</h4>
+                    <input type="text" id="su-phone" placeholder="Enter 10-digit Mobile Number">
+                    <button class="btn-main" style="background: #0288d1;" onclick="sendServerOTP()">📱 Send Server OTP (Test Code: 123456)</button>
+                    
+                    <div id="otp-input-group" style="display: none; margin-top: 15px;">
+                        <input type="text" id="su-otp-code" placeholder="Enter 6-digit OTP code">
+                        <button class="btn-main" style="background: #388e3c;" onclick="verifyServerOTP()">✅ Verify OTP</button>
                     </div>
                 </div>
-                <button id="btn-register" style="margin-top: 15px;" disabled onclick="submitRegistration()">Complete Registration</button>
-                <button style="background: #616161;" onclick="showView('view-role-select')">Back</button>
+
+                <button class="btn-main" id="btn-complete-reg" style="margin-top: 20px; padding: 15px;" disabled onclick="submitUserRegistration()">Complete Registration</button>
+                <button class="btn-secondary" style="width: 150px;" onclick="showView('view-role-select')">Back</button>
             </div>
         </div>
 
-        <!-- Login View -->
+        <!-- VIEW 4: LOGIN -->
         <div id="view-login" class="view">
-            <div class="card" style="max-width: 400px; margin: 0 auto;">
+            <div class="card" style="max-width: 450px; margin: 0 auto;">
                 <h3>Account Login</h3>
-                <input type="text" id="login-phone" placeholder="Mobile Number">
+                <input type="text" id="login-phone" placeholder="Mobile Number or Email">
                 <input type="password" id="login-password" placeholder="Password">
-                <button onclick="login()">Login</button>
-                <button style="background: #616161;" onclick="showView('view-landing')">Back</button>
+                <button class="btn-main" style="padding: 14px; margin-top: 15px;" onclick="executeLogin()">Login</button>
+                <button class="btn-secondary" onclick="showView('view-landing')">Back</button>
             </div>
         </div>
 
-        <!-- Dashboard View -->
+        <!-- VIEW 5: DYNAMIC ROLE DASHBOARDS -->
         <div id="view-dashboard" class="view">
-            <div class="card" id="dashboard-body"></div>
+            <div id="approval-notice" style="background: #fff3cd; color: #856404; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #ffeeba; display: none;">
+                ⚠️ <strong>Account Pending Verification:</strong> Your account is currently under administrative review. Certain actions (like adding listings or accepting jobs) are temporarily locked.
+            </div>
+            <div id="dashboard-container">
+                <!-- Dynamically populated per role -->
+            </div>
         </div>
 
-        <!-- Console -->
-        <div class="card">
-            <h4>Live API Response Console</h4>
-            <div id="console">Ready...</div>
-        </div>
     </div>
 
     <script src="app.js"></script>
